@@ -42,18 +42,43 @@ Customer.create = (newCustomer, result) => {
   };
 
   // Select all Customer
-  Customer.getAll = result => {
-    sql.query("SELECT * FROM customers", (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
+  // Customer.getAll = result => {
+  //   sql.query("SELECT * FROM customers", (err, res) => {
+  //     if (err) {
+  //       console.log("error: ", err);
+  //       result(err, null);
+  //       return;
+  //     }
   
+  //     console.log("customers: ", res);
+  //     result(null, res);
+  //   });
+  // };
+
+  // Customer.getAll = async (result) => {
+
+  //   try {
+  //     const res = await sql.query("SELECT * FROM customers")
+  //     console.log("customers: ", res);
+  //     result(null, res);
+  //   } catch (err) {
+  //     console.log("error: ", err);
+  //     result(err, null);
+  //   }
+  // }
+
+  Customer.getAll = async () => {
+
+    try {
+      const res = await sql.query("SELECT * FROM customers")
       console.log("customers: ", res);
-      result(null, res);
-    });
-  };
+      return [null, res];
+    } catch (err) {
+      console.log("error: ", err);
+      return [err, null];
+    }
+  }
+
 
   // Actualizar Customer
   Customer.updateById = (id, customer, result) => {

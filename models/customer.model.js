@@ -1,5 +1,14 @@
 const sql = require('./database.js');
 
+
+//HANDLE ERRORS
+const catcher = ( promise ) =>
+  promise
+  .then(result => ({ok:true, result}))
+  .catch(error => ({ok:false, error}));
+
+
+
 // constructor
 const Customer = function (customer) {
   this.email = customer.email;
@@ -23,22 +32,40 @@ Customer.create = (newCustomer, result) => {
 
 // Encontrar por ID
 
-Customer.findById = async (customerId, result) => {
-  try {
-    const res = await sql.query(`SELECT * FROM customers WHERE id = ${customerId}`)
-    if (res.length) {
-      console.log("found customer: ", res[0]);
-      result(null, res[0]);
-      return;
+Customer.findById = async (customerId) => {
+    const { ok, result, error} = await catcher(sql.query(`SELECT * FROM customers WHERE id = ${customerId}`))
+    if(ok){
+      if (result.length) {
+        console.log("found customer: ", result[0]);
+        return [null, result[0]];
+      }
+      // not found Customer with the id
+      return [{ kind: "not_found" }, null];
+    } else {
+      console.log("error: ", error);
+      return [error, null];
     }
-    // not found Customer with the id
-    result({ kind: "not_found" }, null);
-  } catch (err) {
-    console.log("error: ", err);
-    result(err, null);
-    return;
-  }
 }
+
+
+
+
+
+// Customer.findById = async (customerId, result) => {
+//   try {
+//     const res = await sql.query(`SELECT * FROM customers WHERE id = ${customerId}`)
+//     if (res.length) {
+//       console.log("found customer: ", res[0]);
+//       return [null, res[0]];
+//     }
+//     // not found Customer with the id
+//     return [{ kind: "not_found" }, null];
+
+//   } catch (err) {
+//     console.log("error: ", err);
+//     return [err, null];
+//   }
+// }
 
 
 

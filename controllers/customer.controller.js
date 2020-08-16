@@ -62,8 +62,8 @@ exports.create = (req, res) => {
 
 
 // Find a single Customer with a customerId
-exports.findOne = (req, res) => {
-    Customer.findById(req.params.customerId, (err, data) => {
+exports.findOne = async (req, res) => {
+    const [err, data ] = await Customer.findById(req.params.customerId);
       if (err) {
         if (err.kind === "not_found") {
           res.status(404).send({
@@ -75,8 +75,27 @@ exports.findOne = (req, res) => {
           });
         }
       } else res.send(data);
-    });
-  };
+    }
+
+  // exports.findOne = (req, res) => {
+  //   Customer.findById(req.params.customerId, (err, data) => {
+  //     if (err) {
+  //       if (err.kind === "not_found") {
+  //         res.status(404).send({
+  //           message: `Not found Customer with id ${req.params.customerId}.`
+  //         });
+  //       } else {
+  //         res.status(500).send({
+  //           message: "Error retrieving Customer with id " + req.params.customerId
+  //         });
+  //       }
+  //     } else res.send(data);
+  //   });
+  // };
+
+
+
+
 
 // Update a Customer identified by the customerId in the request
 exports.update = (req, res) => {

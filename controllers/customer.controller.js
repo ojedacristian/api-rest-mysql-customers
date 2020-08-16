@@ -1,7 +1,7 @@
 const Customer = require("../models/customer.model.js");
 
 // Create and Save a new Customer
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (!req.body) {
     res.status(400).send({
@@ -20,9 +20,10 @@ exports.create = async (req, res) => {
   const {ok, result, error} = await Customer.create(customer)
     if(!ok){
       console.log("error: ", error);
-      res.status(500).send({
-        message: error.message || "Some error occurred while creating the Customer."
-      });
+      // res.status(500).send({
+      //   message: error.message || "Some error occurred while creating the Customer."
+      // });
+      next(error)
     }else{
       console.log("created customer: ", { id: result.insertId, ...customer });
       res.send({id:result.insertId, ...customer});

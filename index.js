@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const app = express();
+const handleErrors = require('./middlewares/handleErrors.js')
 
 // parse requests of content-type: application/json
 app.use(bodyParser.json());
@@ -16,7 +17,7 @@ app.get('/', (req, res) => {
 
 // require("./routes/customer.routes.js")(app);
 app.use(require('./routes/customer.routes.js'));
-
+app.use(handleErrors);
 
 // set port, listen for requests
 app.listen(3000, () => {

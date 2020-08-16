@@ -18,7 +18,7 @@ const Customer = function (customer) {
 
 // Crear Customer
 Customer.create = async (newCustomer) => {
-  return await catchErr(sql.query("INSERT INTO customers SET ?", [newCustomer]))
+  return await catchErr(sql.query("INSERT INTO custmers SET ?", [newCustomer]))
   }
 // Customer.create = (newCustomer, result) => {
 //   sql.query("INSERT INTO customers SET ?", newCustomer, (err, res) => {

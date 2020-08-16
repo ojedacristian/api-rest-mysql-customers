@@ -19,10 +19,6 @@ exports.create = async (req, res, next) => {
   // Save Customer in the database
   const {ok, result, error} = await Customer.create(customer)
     if(!ok){
-      console.log("error: ", error);
-      // res.status(500).send({
-      //   message: error.message || "Some error occurred while creating the Customer."
-      // });
       next(error)
     }else{
       console.log("created customer: ", { id: result.insertId, ...customer });
@@ -30,39 +26,14 @@ exports.create = async (req, res, next) => {
     } 
   }
 
-
-
-// Retrieve all Customers from the database.
-// exports.findAll = (req, res) => {
-//     Customer.getAll((err, data) => {
-//       if (err)
-//         res.status(500).send({
-//           message:
-//             err.message || "Some error occurred while retrieving customers."
-//         });
-//       else res.send(data);
-//     });
-//   };
-
-exports.findAll = async (req, res) => {
-
-  [err, data] = await Customer.getAll();
-  console.log(err, data);
-
-  if (err) {
-    res.status(500).send({
-      message:
-        err.message || "Some error occurred while retrieving customers."
-    });
+exports.findAll = async (req, res, next) => {
+  const { ok, result, error } = await Customer.getAll();
+  if (!ok) {
+    next(error)
   } else {
-    res.send(data);
+    res.send(result);
   }
 };
-
-
-
-
-
 
 // Find a single Customer with a customerId
 exports.findOne = async (req, res) => {
@@ -85,45 +56,8 @@ exports.findOne = async (req, res) => {
   }
 }
 
-// exports.findOne = async (req, res) => {
-//   const [err, data ] = await Customer.findById(req.params.customerId);
-//     if (err) {
-//       if (err.kind === "not_found") {
-//         res.status(404).send({
-//           message: `Not found Customer with id ${req.params.customerId}.`
-//         });
-//       } else {
-//         res.status(500).send({
-//           message: "Error retrieving Customer with id " + req.params.customerId
-//         });
-//       }
-//     } else res.send(data);
-//   }
-
-
-
-// exports.findOne = (req, res) => {
-//   Customer.findById(req.params.customerId, (err, data) => {
-//     if (err) {
-//       if (err.kind === "not_found") {
-//         res.status(404).send({
-//           message: `Not found Customer with id ${req.params.customerId}.`
-//         });
-//       } else {
-//         res.status(500).send({
-//           message: "Error retrieving Customer with id " + req.params.customerId
-//         });
-//       }
-//     } else res.send(data);
-//   });
-// };
-
-
-
-
-
 // Update a Customer identified by the customerId in the request
-exports.update = (req, res) => {
+exports.update = async (req, res,next) => {
   // Validate Request
   if (!req.body) {
     res.status(400).send({
@@ -131,52 +65,45 @@ exports.update = (req, res) => {
     });
   }
 
-  Customer.updateById(
-    req.params.customerId,
-    new Customer(req.body),
-    (err, data) => {
-      if (err) {
-        if (err.kind === "not_found") {
-          res.status(404).send({
-            message: `Not found Customer with id ${req.params.customerId}.`
-          });
-        } else {
-          res.status(500).send({
-            message: "Error updating Customer with id " + req.params.customerId
-          });
-        }
-      } else res.send(data);
-    }
-  );
-};
-
-
-
-
-// Delete a Customer with the specified customerId in the request
-exports.delete = (req, res) => {
-  Customer.remove(req.params.customerId, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
+  const { ok, result, error } = await Customer.updateById(req.params.customerId, new Customer(req.body))
+  if(!ok){
+    next(error)
+  } else {
+    if ( result.affectedRows ){
+      console.log("updated customer: ", { id: req.params.customerId, ...req.body });
+      res.send({ ...req.body, id: req.params.customerId });
+    } else {
         res.status(404).send({
           message: `Not found Customer with id ${req.params.customerId}.`
         });
+    }
+  }      
+
+}
+
+
+// Delete a Customer with the specified customerId in the request
+exports.delete = async (req, res, next) => {
+  const { ok, result, error} = await Customer.remove(req.params.customerId)
+    if (!ok) {
+      next(error)
+    } else {
+      if( result.affectedRows ){
+        res.send({ message: `Customer ${req.params.customerId} was deleted successfully!` });
       } else {
-        res.status(500).send({
-          message: "Could not delete Customer with id " + req.params.customerId
+        res.status(404).send({
+          message: `Not found Customer with id ${req.params.customerId}.`
         });
       }
-    } else res.send({ message: `Customer was deleted successfully!` });
-  });
-};
+    }
+  } 
+
 // Delete all Customers from the database.
-exports.deleteAll = (req, res) => {
-  Customer.removeAll((err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all customers."
-      });
-    else res.send({ message: `All Customers were deleted successfully!` });
-  });
-};
+exports.deleteAll = async (req, res, next) => {
+  const { ok, result, error } = await Customer.removeAll()
+    if (!ok){
+      next(error)
+    } else {
+      res.send({ message: `${ result.affectedRows } Customers were deleted successfully!` })
+    } 
+  }

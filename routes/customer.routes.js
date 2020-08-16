@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-
-
-
     const customers = require("../controllers/customer.controller.js");
   
     // Create a new Customer

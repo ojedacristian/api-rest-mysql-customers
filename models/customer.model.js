@@ -6,6 +6,7 @@ const Customer = function (customer) {
   this.email = customer.email;
   this.name = customer.name;
   this.active = customer.active;
+  this.avatar = customer.avatar;
 };
 
 // Crear Customer
@@ -26,8 +27,8 @@ Customer.getAll = async () => {
 
 // Actualizar Customer
 Customer.updateById = async (id, customer) => {
-  return await catchErr(sql.query("UPDATE customers SET email = ?, name = ?, active = ? WHERE id = ?",[customer.email, customer.name, customer.active, id])) 
-
+  console.log(id, customer);
+  return await catchErr(sql.query("UPDATE customers SET ? WHERE id = ?",[customer, id])) 
 };
 
 // Eliminar Customer

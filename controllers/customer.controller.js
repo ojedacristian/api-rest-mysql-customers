@@ -1,5 +1,6 @@
 const Customer = require("../models/customer.model.js");
-
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Create and Save a new Customer
 exports.create = async (req, res, next) => {
@@ -24,9 +25,12 @@ exports.create = async (req, res, next) => {
   const {ok, result, error} = await Customer.create(customer)
     if(!ok){
       next(error)
-    }else{
+    } else {
       console.log("created customer: ", { id: result.insertId, ...customer });
-      res.send({id:result.insertId, ...customer});
+      const token = jwt.sign({ id: result.insertId }, process.env.SECRET, {
+        expiresIn: 60 * 60 * 24 // expires in 24 hours
+      });
+      res.send({auth:true, id:result.insertId, ...customer, token});
     } 
   }
 

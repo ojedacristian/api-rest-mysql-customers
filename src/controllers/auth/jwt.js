@@ -16,4 +16,27 @@ async function verifyToken(req, res, next) {
     }
 }
 
-module.exports = verifyToken;
+const generarToken = ( id ) =>{
+
+    return new Promise((resolve, reject) => {
+
+        const payload = { id };
+
+        jwt.sign(payload, process.env.SECRET, {
+            expiresIn: 60 * 60 * 24 // expires in 24 hours
+          }, (err, token)=>{
+              if (err){
+                  console.log(error);
+                  reject('no se pudo generar el token')
+              }
+              resolve(token);
+          });
+    })
+
+}
+
+
+module.exports = {
+    verifyToken,
+    generarToken
+};
